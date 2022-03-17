@@ -1,0 +1,71 @@
+---
+- name: Installing sigsci-agent and sigci-iis-module 
+  hosts: windows
+  tasks:
+
+    - name: Create temporary directory
+      win_file: 
+        path: C:\Temp\
+        state: directory
+
+    - name: Download the sigci-agent agent
+      win_get_url:
+        url: https://dl.signalsciences.net/sigsci-agent/sigsci-agent_latest.msi
+        dest: C:\Temp\sigci-agent_latest.msi
+
+    - name: Download the sigci IIS module
+      win_get_url: 
+        url: https://dl.signalsciences.net/sigsci-module-iis/sigsci-module-iis_latest.msi
+        dest: C:\Temp\sigsci-module-iis_latest.msi
+
+    - name: Copy powershells
+      win_copy:
+        src: "{{ item }}"
+        dest: C:\Temp\
+      with_items: 
+        - getMsiVersion.ps1
+        - getInstalledVer.ps1
+
+    - name: Find Msi version of sigsci agent
+      win_shell: |
+        powershell.exe -ExecutionPolicy ByPass -File C:\Temp\getMsiVersion.ps1 C:\Temp\sigci-agent_latest.msi
+      register: agent_ver
+
+    - debug: var=agent_ver.stdout_lines
+
+    - name: Find Msi version of sigsci iis-module
+      win_shell: |
+        powershell.exe -ExecutionPolicy ByPass -File C:\Temp\getMsiVersion.ps1 C:\Temp\sigsci-module-iis_latest.msi
+      register: module_iis_ver
+    - debug: var=module_iis_ver.stdout_lines
+    
+    - name: Check installed version of sigsci agent
+      win_shell: |
+        powershell.exe -ExecutionPolicy ByPass -File C:\Temp\getInstalledVer.ps1 "Signal Sciences Agent"
+      register: installed_agent
+    - debug: var=installed_agent.stdout_lines
+
+    - name: Check installed version of sigsci module-iis
+      win_shell: |
+        powershell.exe -ExecutionPolicy ByPass -File C:\Temp\getInstalledVer.ps1 "Signal Sciences IIS Module"
+      register: installed_signaliismodule
+    - debug: var=installed_signaliismodule.stdout_lines      
+     
+    - name: POST a Body to an Endpoint
+      ansible.windows.win_uri:
+        url: http://www.somesite.com/
+        method: POST
+        body: "{ 'some': 'json' }"
+      when: agent_ver != installed_agent
+    
+    - name: POST a Body to an Endpoint
+      ansible.windows.win_uri:
+        url: http://www.somesite.com/
+        method: POST
+        body: "{ 'some': 'json' }"
+      when: module_iis_ver != installed_signaliismodule
+
+    - name: Remove temporary directory
+      win_file: 
+        path: C:\Temp\
+        state: absent

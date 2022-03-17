@@ -1,0 +1,9 @@
+[windows]
+WINxxx ansible_host=xxx.xxx.xxx.xxx
+
+[windows:vars]
+ansible_user=xxx
+ansible_password=xxx
+ansible_connection=<connection_type>
+ansible_winrm_transport=basic
+ansible_port=<port-num>
