@@ -60,7 +60,7 @@
     
     - name: POST a Body to an Endpoint
       ansible.windows.win_uri:
-        url: http://www.somesite.com/
+        url: http://
         method: POST
         body: "{ 'some': 'json' }"
       when: module_iis_ver != installed_signaliismodule
