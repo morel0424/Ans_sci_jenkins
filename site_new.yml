@@ -64,7 +64,7 @@
         method: POST
         body: "{ 'some': 'json' }"
       when: module_iis_ver != installed_signaliismodule
-
+#create a seconde playbook and run this in jenkins
     - name: Remove temporary directory
       win_file: 
         path: C:\Temp\
