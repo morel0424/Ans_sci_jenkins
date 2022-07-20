@@ -5,4 +5,4 @@ WINxxx ansible_host=xxx.xxx.xxx.xxx
 ansible_user=xxx
 ansible_password=xxx
 ansible_connection=<connection_type>
-ansible_winrm_transport=basic
+ansible_winrm_transport=base
